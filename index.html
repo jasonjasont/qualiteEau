@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html>
+
 <head>
-    <meta charset="UTF-8"> 
+    <meta charset="UTF-8">
     <title>Qualite de l'eau</title>
 </head>
 
@@ -13,19 +14,34 @@
         <input type="submit" value="Submit">
     </form>
 
-    <script>
-    document.querySelector('form').addEventListener('submit', function(e) {
-        e.preventDefault(); // Empêche le rechargement de la page
-        var ville = document.querySelector('#ville').value; // Récupère la valeur du champ de texte
+    <div id="mapid" style="height: 180px;"></div>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 
-        fetch('https://hubeau.eaufrance.fr/api/v2/qualite_rivieres/station_pc?libelle_commune=' + ville + '&pretty') // Utilise la valeur de la variable ville dans l'URL
-            .then(response => response.json()) // Transforme la réponse en JSON
-            .then(data => {
-                console.log(data); // Affiche les données dans la console
-                // Vous pouvez ajouter ici le code pour afficher les données sur la page
-            })
-            .catch(err => console.error(err)); // Affiche l'erreur dans la console en cas d'échec de la requête
-    });
-</script>
+    <script>
+        document.querySelector('form').addEventListener('submit', function (e) {
+            e.preventDefault(); // Empêche le rechargement de la page
+            var ville = document.querySelector('#ville').value; // Récupère la valeur du champ de texte
+
+            fetch('https://hubeau.eaufrance.fr/api/v2/qualite_rivieres/station_pc?libelle_commune=' + ville + '&pretty&fields=code_station,libelle_station,localisation_precise,code_commune,libelle_commune,code_cours_eau,nom_cours_eau,longitude,latitude') // Utilise la valeur de la variable ville dans l'URL
+                .then(response => response.json()) // Transforme la réponse en JSON
+                .then(data => {
+                    console.log(data); // Affiche les données dans la console
+
+                    // Crée une carte et la centre sur les coordonnées récupérées
+                    var map = L.map('mapid').setView([data.data[0].latitude, data.data[0].longitude], 13);
+
+                    // Ajoute un fond de carte
+                    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                        maxZoom: 19,
+                    }).addTo(map);
+                    // Ajoute un marqueur sur la carte aux coordonnées récupérées
+                    L.marker([data.data[0].latitude, data.data[0].longitude]).addTo(map);
+
+                })
+                .catch(err => console.error(err)); // Affiche l'erreur dans la console en cas d'échec de la requête
+        });
+    </script>
 </body>
+
 </html>
