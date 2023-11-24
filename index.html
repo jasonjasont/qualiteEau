@@ -9,13 +9,17 @@
 
 <body>
     <h1>Qualite de l'eau</h1>
-    <form
-        <label for="ville">Nom de la ville:</label><br>
+    <h2>Description de l'outil</h2>
+    <p>Cet outil vous fournit les stations de prélèvement de qualité de l'eau les plus proches du nom de la ville donnée.
+         Il vous suffit de saisir le nom de la ville dans le champ de texte et de cliquer sur "Rechercher". Vous obtiendrez 
+         alors une carte affichant les stations de prélèvement de qualité de l'eau de la ville recherchée.
+    </p>
+    <form <label for="ville">Nom de la ville:</label><br>
         <input type="text" id="ville" name="ville"><br>
         <input type="submit" value="Rechercher">
     </form>
 
-    
+
     <div id="mapid" style="height: 500px;"></div>
     <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
