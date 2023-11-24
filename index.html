@@ -3,17 +3,19 @@
 
 <head>
     <meta charset="UTF-8">
+    <link rel="stylesheet" href="style.css">
     <title>Qualite de l'eau</title>
 </head>
 
 <body>
-    <p>Qualite de l'eau</p>
-    <form>
+    <h1>Qualite de l'eau</h1>
+    <form
         <label for="ville">Nom de la ville:</label><br>
         <input type="text" id="ville" name="ville"><br>
-        <input type="submit" value="Submit">
+        <input type="submit" value="Rechercher">
     </form>
 
+    
     <div id="mapid" style="height: 500px;"></div>
     <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
