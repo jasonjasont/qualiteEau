@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="style.css">
+    <title>Qualite de l'eau</title>
+</head>
+
+<body>
+    <h1>Qualite de l'eau</h1>
+    <h2>Description de l'outil</h2>
+    <p>Cet outil vous fournit les stations de prélèvement de qualité de l'eau les plus proches du nom de la ville
+        donnée.
+        Il vous suffit de saisir le nom de la ville dans le champ de texte et de cliquer sur "Rechercher". Vous
+        obtiendrez
+        alors une carte affichant les stations de prélèvement de qualité de l'eau de la ville recherchée.
+    </p>
+    <form <label for="ville">Nom de la ville:</label><br>
+        <input type="text" id="ville" name="ville"><br>
+        <input type="submit" value="Rechercher">
+    </form>
+
+
+    <div id="mapid" style="height: 500px;"></div>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+    <script>
+        var map; // Déclare la variable map en dehors de l'événement submit
+
+        document.querySelector('form').addEventListener('submit', function (e) {
+            e.preventDefault(); // Empêche le rechargement de la page
+            var ville = document.querySelector('#ville').value; // Récupère la valeur du champ de texte
+
+            fetch('https://hubeau.eaufrance.fr/api/v2/qualite_rivieres/station_pc?libelle_commune=' + ville + '&pretty&fields=code_station,libelle_station,localisation_precise,code_commune,libelle_commune,code_cours_eau,nom_cours_eau,longitude,latitude') // Utilise la valeur de la variable ville dans l'URL
+                .then(response => response.json()) // Transforme la réponse en JSON
+                .then(data => {
+                    console.log(data); // Affiche les données dans la console
+
+                    // Vérifie si la carte existe déjà
+                    if (map) {
+                        // Si oui, réinitialise la vue de la carte
+                        map.setView([data.data[0].latitude, data.data[0].longitude], 13);
+                    } else {
+                        // Si non, crée une nouvelle carte
+                        map = L.map('mapid').setView([data.data[0].latitude, data.data[0].longitude], 13);
+
+                        // Ajoute un fond de carte
+                        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                            maxZoom: 19,
+                        }).addTo(map);
+                    }
+
+                    // Ajoute un marqueur sur la carte pour chaque résultat
+                    data.data.forEach(function (item) {
+                        L.marker([item.latitude, item.longitude])
+                            .bindPopup(
+                                '<b>' + item.libelle_station + '</b><br>' +
+                                'Code station: ' + item.code_station + '<br>' +
+                                'Localisation précise: ' + item.localisation_precise + '<br>' +
+                                'Code commune: ' + item.code_commune + '<br>' +
+                                'Libelle commune: ' + item.libelle_commune + '<br>' +
+                                'Nom cours d\'eau: ' + item.nom_cours_eau
+                            )
+                            .addTo(map);
+                    });
+                })
+                .catch(err => console.error(err)); // Affiche l'erreur dans la console en cas d'échec de la requête
+        });
+    </script>
+</body>
+
+</html>
