@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+
 <html>
 
 <head>
@@ -25,6 +26,10 @@
     <div id="mapid" style="height: 500px;"></div>
     <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+
+    <div id="data-container"></div>
+    
 
     <script>
         var map; // Déclare la variable map en dehors de l'événement submit
@@ -53,22 +58,42 @@
                     }
 
                     // Ajoute un marqueur sur la carte pour chaque résultat
-                    data.data.forEach(function (item) {
-                        L.marker([item.latitude, item.longitude])
-                            .bindPopup(
-                                '<b>' + item.libelle_station + '</b><br>' +
-                                'Code station: ' + item.code_station + '<br>' +
-                                'Localisation précise: ' + item.localisation_precise + '<br>' +
-                                'Code commune: ' + item.code_commune + '<br>' +
-                                'Libelle commune: ' + item.libelle_commune + '<br>' +
-                                'Nom cours d\'eau: ' + item.nom_cours_eau
-                            )
-                            .addTo(map);
-                    });
+    data.data.forEach(function (item) {
+        let marker = L.marker([item.latitude, item.longitude])
+            .bindPopup(
+                '<b>' + item.libelle_station + '</b><br>' +
+                'Code station: ' + item.code_station + '<br>' +
+                'Localisation précise: ' + item.localisation_precise + '<br>' +
+                'Code commune: ' + item.code_commune + '<br>' +
+                'Libelle commune: ' + item.libelle_commune + '<br>' +
+                'Nom cours d\'eau: ' + item.nom_cours_eau
+            )
+            .addTo(map);
+
+        marker.on('click', function () {
+            fetch('http://hubeau.eaufrance.fr/api/v2/qualite_rivieres/analyse_pc?code_station=' + item.code_station + '&libelle_parametre=Nitrates&date_debut_prelevement=2020-01-01&code_qualification=1&pretty=&fields=code_station%2Clibelle_station%2Ccode_parametre%2Clibelle_parametre%2Cdate_prelevement%2Cresultat%2Csymbole_unite%2Ccode_remarque%2Cmnemo_remarque%2Ccode_statut%2Cmnemo_statut%2Ccode_qualification%2Clibelle_qualification&size=1000')
+                .then(response => {
+                    console.log(response); // Affiche la réponse dans la console
+                    return response.json(); // Transforme la réponse en JSON
+                })
+                .then(data => {
+                    console.log(data); // Affiche les données dans la console
+
+                    // Sélectionne l'élément de conteneur de données et modifie son contenu
+                    var dataContainer = document.getElementById('data-container');
+                    dataContainer.innerHTML = JSON.stringify(data, null, 2); // Affiche les données sous forme de chaîne JSON formatée
                 })
                 .catch(err => console.error(err)); // Affiche l'erreur dans la console en cas d'échec de la requête
         });
+    });
+                })
+                .catch(err => console.error(err)); // Affiche l'erreur dans la console en cas d'échec de la requête
+        });
+
+        
     </script>
 </body>
+  
 
 </html>
+
